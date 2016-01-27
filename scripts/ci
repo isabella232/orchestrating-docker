@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd $(dirname $0)/..
+TAG=${BUILD_NUMBER:-"latest"}
+
+pushd nginx
+docker build --rm -t rancheriodhci/demo-nginx:${TAG} .
+popd
+pushd web
+docker build --rm -t rancheriodhci/demo-web:${TAG} .

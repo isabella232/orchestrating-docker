@@ -1,0 +1,7 @@
+#!/bin/bash
+
+TAG=${TAG:-"latest"}
+
+for i in demo-nginx demo-web; do 
+	docker push ${DOCKER_HUB_USER}/${i}:${TAG}
+done

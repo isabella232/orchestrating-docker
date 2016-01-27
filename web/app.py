@@ -1,5 +1,6 @@
 # app.py
 
+import socket
 
 from flask import Flask
 from flask import request, render_template
@@ -17,13 +18,15 @@ from models import *
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    template_data = {}
     if request.method == 'POST':
         text = request.form['text']
         post = Post(text)
         db.session.add(post)
         db.session.commit()
-    posts = Post.query.order_by(Post.date_posted.desc()).all()
-    return render_template('index.html', posts=posts)
+    template_data["posts"] = Post.query.order_by(Post.date_posted.desc()).all()
+    template_data["hostname"] = socket.gethostname()
+    return render_template('index.html', **template_data)
 
 
 if __name__ == '__main__':

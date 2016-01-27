@@ -1,37 +1,50 @@
+messageboard-lb:
+  ports:
+  - 80:80
+  tty: true
+  image: rancher/load-balancer-service
+  links:
+  - nginx:nginx
+  stdin_open: true
+
 web:
-  restart: always
-  build: ./web
+  image: rancheriodhci/demo-web:${TAG}
   expose:
     - "8000"
-  links:
-    - postgres:postgres
   volumes:
     - /usr/src/app/static
+  command: '/usr/src/app/start_app.sh'
   env_file: .env
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
+  labels:
+    io.rancher.container.hostname_override: "container_name"
 
 nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
+  image: rancheriodhci/demo-nginx:${TAG}
+  links:
+    - postgres:postgres
+    - web:web
   volumes:
     - /www/static
   volumes_from:
     - web
-  links:
-    - web:web
+  labels:
+    io.rancher.sidekicks: web
+    io.rancher.container.hostname_override: "container_name"
+  command: /bin/sh -c "sleep 10 && /usr/sbin/nginx"
 
-data:
+postgres-data:
   image: postgres:latest
+  net: none
+  labels:
+    io.rancher.container.start_once: "true"
   volumes:
     - /var/lib/postgresql
-  command: "true"
-
+  command: "/bin/true"
 postgres:
-  restart: always
   image: postgres:latest
   volumes_from:
-    - data
-  ports:
-    - "5432:5432"
+    - postgres-data
+  expose:
+    - "5432"
+  labels:
+    io.rancher.sidekicks: postgres-data
