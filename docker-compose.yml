@@ -33,7 +33,7 @@ nginx:
   command: /bin/sh -c "sleep 10 && /usr/sbin/nginx"
 
 postgres-data:
-  image: postgres:latest
+  image: postgres:9.5.0
   net: none
   labels:
     io.rancher.container.start_once: "true"
@@ -41,7 +41,7 @@ postgres-data:
     - /var/lib/postgresql
   command: "/bin/true"
 postgres:
-  image: postgres:latest
+  image: postgres:9.5.0
   volumes_from:
     - postgres-data
   expose:
