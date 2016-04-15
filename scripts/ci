@@ -2,6 +2,7 @@
 
 cd $(dirname $0)/..
 TAG=${BUILD_NUMBER:-"latest"}
+./scripts/bootstrap
 
 pushd nginx
 docker build --rm -t rancheriodhci/demo-nginx:${TAG} .
